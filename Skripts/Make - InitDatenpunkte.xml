@@ -1,0 +1,404 @@
+<xml xmlns="https://developers.google.com/blockly/xml">
+  <variables>
+    <variable id="dH_WBDgeeJ)E9r_L6/By">maximaleWarmwasserTemperatur</variable>
+    <variable id="qnYL}{~3]|a^bApl`Z$%">standardWarmwasserTemperatur</variable>
+  </variables>
+  <block type="procedures_callnoreturn" id=",wt[gg2=7dUgiiYwYc(b" x="-1912" y="-1287">
+    <mutation name="starteSkript"></mutation>
+  </block>
+  <block type="procedures_defnoreturn" id="Wf8=i~9c#Cz7+t/47^kW" x="-1787" y="-1287">
+    <field name="NAME">starteSkript</field>
+    <comment pinned="false" h="80" w="160">Beschreibe diese Funktion …</comment>
+    <statement name="STACK">
+      <block type="variables_set" id="2WQBthGQts$X4~.Cc_|=">
+        <field name="VAR" id="dH_WBDgeeJ)E9r_L6/By">maximaleWarmwasserTemperatur</field>
+        <value name="VALUE">
+          <block type="math_number" id="tg@F,dIV7#@vqRq;O]bt">
+            <field name="NUM">55</field>
+          </block>
+        </value>
+        <next>
+          <block type="variables_set" id="2|rBth4:3Ogur=tr!gIX">
+            <field name="VAR" id="qnYL}{~3]|a^bApl`Z$%">standardWarmwasserTemperatur</field>
+            <value name="VALUE">
+              <block type="math_number" id="y2=X*D%-jLo!/F%WA]RP">
+                <field name="NUM">49</field>
+              </block>
+            </value>
+            <next>
+              <block type="procedures_callnoreturn" id="8Ip/eoh9M_YbI~`[#)?7">
+                <mutation name="datenpunkteWPSteuerungAnlegen"></mutation>
+                <next>
+                  <block type="procedures_callnoreturn" id="wy]%tWK%2U:qT~N2)bNt">
+                    <mutation name="datenpunkteWPEvccAnlegen"></mutation>
+                    <next>
+                      <block type="procedures_callnoreturn" id="{di7!ek32Z_0?KKs+ghr">
+                        <mutation name="datenpunkteWPZaehlerAnlegen"></mutation>
+                        <next>
+                          <block type="comment" id="s|;S^eC.Ui}]YY:lO`$R">
+                            <field name="COMMENT">Gib ioBroker ein wenig Zeit, die Datenpunkte&amp;#10;anzulegen. Vermeidet Warnungen beim &amp;#10;ersten anlegen.</field>
+                            <next>
+                              <block type="timeouts_wait" id="51ZM!mKmATQfc=P$)w%{">
+                                <field name="DELAY">1000</field>
+                                <field name="UNIT">ms</field>
+                                <next>
+                                  <block type="procedures_callnoreturn" id="~Or:lr9vnjH-~_=eBzRs">
+                                    <mutation name="datenpunkteStandartwerteSetzen"></mutation>
+                                  </block>
+                                </next>
+                              </block>
+                            </next>
+                          </block>
+                        </next>
+                      </block>
+                    </next>
+                  </block>
+                </next>
+              </block>
+            </next>
+          </block>
+        </next>
+      </block>
+    </statement>
+  </block>
+  <block type="procedures_defnoreturn" id="C1z/4a,5=C*)O5d(4HR]" x="-1363" y="-1288">
+    <field name="NAME">datenpunkteWPSteuerungAnlegen</field>
+    <comment pinned="false" h="80" w="160">Beschreibe diese Funktion …</comment>
+    <statement name="STACK">
+      <block type="comment" id="AQ*Y)Eu$Rf!nQnE#?vsC">
+        <field name="COMMENT">maximale Warmwassertemperatur&amp;#10;Mapping auf mqtt Topic:&amp;#10;home/wp/steuerung/maxTemp</field>
+        <next>
+          <block type="create_ex" id="|1/J9E[t#k}+1aFE8i!!">
+            <field name="NAME">0_userdata.0.wp.steuerung.maxTemp</field>
+            <field name="TYPE">number</field>
+            <field name="READABLE">TRUE</field>
+            <field name="WRITEABLE">TRUE</field>
+            <value name="VALUE">
+              <block type="variables_get" id="YKrhXWYLII:_K?!D#NuA">
+                <field name="VAR" id="dH_WBDgeeJ)E9r_L6/By">maximaleWarmwasserTemperatur</field>
+              </block>
+            </value>
+            <next>
+              <block type="comment" id="s^cRuZ1iFR+g+GGJLWvb">
+                <field name="COMMENT">Warmwasser Zieltemperatur&amp;#10;wird vom Skript regelmäßig geprüft iund an evcc übermittelt</field>
+                <next>
+                  <block type="create_ex" id="L#Z/v47B7hQ8Q%Dmy+y?">
+                    <field name="NAME">0_userdata.0.wp.steuerung.pvZielTemp</field>
+                    <field name="TYPE">number</field>
+                    <field name="READABLE">TRUE</field>
+                    <field name="WRITEABLE">TRUE</field>
+                    <value name="VALUE">
+                      <block type="variables_get" id="@)E)~lLiT{E*zWg][4(J">
+                        <field name="VAR" id="dH_WBDgeeJ)E9r_L6/By">maximaleWarmwasserTemperatur</field>
+                      </block>
+                    </value>
+                    <next>
+                      <block type="comment" id="=Q7Ysw0ubDEyU6I+}Wma">
+                        <field name="COMMENT">Standard Warmwassertemperatur&amp;#10;Mapping auf mqtt Topic: &amp;#10;home/wp/steuerung/stdTemp</field>
+                        <next>
+                          <block type="create_ex" id="iQ:GlBwV@?c?K;J]*Ti0">
+                            <field name="NAME">0_userdata.0.wp.steuerung.stdTemp</field>
+                            <field name="TYPE">number</field>
+                            <field name="READABLE">TRUE</field>
+                            <field name="WRITEABLE">TRUE</field>
+                            <value name="VALUE">
+                              <block type="variables_get" id="`BNHs|Na25gPo47:WEO6">
+                                <field name="VAR" id="qnYL}{~3]|a^bApl`Z$%">standardWarmwasserTemperatur</field>
+                              </block>
+                            </value>
+                            <next>
+                              <block type="comment" id="oLAn]13t2w?V)V?)q}=h">
+                                <field name="COMMENT">Warmwassertemperatur, die an die Wärmepumpe&amp;#10;weitergegeben wird.&amp;#10;Mapping auf mqtt Topic: &amp;#10;home/wp/steuerung/sollTemp</field>
+                                <next>
+                                  <block type="create_ex" id=";r[J$g9w!?LAMKT|$?:T">
+                                    <field name="NAME">0_userdata.0.wp.steuerung.sollTemp</field>
+                                    <field name="TYPE">number</field>
+                                    <field name="READABLE">TRUE</field>
+                                    <field name="WRITEABLE">TRUE</field>
+                                    <value name="VALUE">
+                                      <block type="variables_get" id="T9h(uY.2AH0$2?|qw22q">
+                                        <field name="VAR" id="qnYL}{~3]|a^bApl`Z$%">standardWarmwasserTemperatur</field>
+                                      </block>
+                                    </value>
+                                  </block>
+                                </next>
+                              </block>
+                            </next>
+                          </block>
+                        </next>
+                      </block>
+                    </next>
+                  </block>
+                </next>
+              </block>
+            </next>
+          </block>
+        </next>
+      </block>
+    </statement>
+  </block>
+  <block type="procedures_defnoreturn" id="#:2S4q|3ABq-$HUlDOHQ" x="-713" y="-1287">
+    <field name="NAME">datenpunkteWPZaehlerAnlegen</field>
+    <comment pinned="false" h="80" w="160">Beschreibe diese Funktion …</comment>
+    <statement name="STACK">
+      <block type="comment" id="/uV)faUm[O`LCG0}0m(s">
+        <field name="COMMENT">aktuelle Temperatur im Warmwassertank&amp;#10;Wert muss von Wärmepumpe übernommen werden&amp;#10;Mapping auf mqtt Topic:&amp;#10;home/wp/zaehler/aktTemp</field>
+        <next>
+          <block type="create_ex" id="y(6l=E+dX(qCoG^eF=Y2">
+            <field name="NAME">0_userdata.0.wp.zaehler.aktTemp</field>
+            <field name="TYPE">number</field>
+            <field name="READABLE">TRUE</field>
+            <field name="WRITEABLE">TRUE</field>
+            <value name="VALUE">
+              <block type="math_number" id="5JBH9IxC@0g:%V1Tr230">
+                <field name="NUM">0</field>
+              </block>
+            </value>
+            <next>
+              <block type="comment" id="y-,iMxf0Q*5nh!.WB{#$">
+                <field name="COMMENT">aktueller Verbrauch der Wärmepumpe in Watt&amp;#10;Wert muss vom Gerät übernommen werden&amp;#10;Mapping auf mqtt Topic:&amp;#10;home/wp/zaehler/aktLeistung</field>
+                <next>
+                  <block type="create_ex" id="MXxf_BZou+s$INn2;$LB">
+                    <field name="NAME">0_userdata.0.wp.zaehler.aktLeistung</field>
+                    <field name="TYPE">number</field>
+                    <field name="READABLE">TRUE</field>
+                    <field name="WRITEABLE">TRUE</field>
+                    <value name="VALUE">
+                      <block type="math_number" id="L;=j6,A!p:zVDMi9G65`">
+                        <field name="NUM">0</field>
+                      </block>
+                    </value>
+                  </block>
+                </next>
+              </block>
+            </next>
+          </block>
+        </next>
+      </block>
+    </statement>
+  </block>
+  <block type="procedures_defnoreturn" id="i.1G.7q48i8v/tawLIm^" x="-212" y="-1287">
+    <field name="NAME">datenpunkteWPEvccAnlegen</field>
+    <comment pinned="false" h="80" w="160">Beschreibe diese Funktion …</comment>
+    <statement name="STACK">
+      <block type="comment" id="wBV1FBxfhHfP;-$`DVv[">
+        <field name="COMMENT">Ladestatus (A/B/C)&amp;#10;Der Wert wird vom Steuerskript geseztzt&amp;#10;Mapping auf mqtt Topic:&amp;#10;home/wp/evcc/ladestatus</field>
+        <next>
+          <block type="create_ex" id="*g:Bt,vim!BN=.|hM2M|">
+            <field name="NAME">0_userdata.0.wp.evcc.ladestatus</field>
+            <field name="TYPE">string</field>
+            <field name="READABLE">TRUE</field>
+            <field name="WRITEABLE">TRUE</field>
+            <value name="VALUE">
+              <block type="text" id="9DER:Q:2/lS3hyGndUey">
+                <field name="TEXT">B</field>
+              </block>
+            </value>
+            <next>
+              <block type="comment" id="FWx9%C(WQY/vvLO9*|ps">
+                <field name="COMMENT">Ist wahr, sobald das Überladen des Warmwassers&amp;#10;erlaubt ist&amp;#10;Der Wert wird von evcc gesetzt&amp;#10;Mapping auf mqtt Topic:&amp;#10;home/wp/evcc/aktivierbar</field>
+                <next>
+                  <block type="create_ex" id="3mVif2$XgAv#XMmQ^HAJ">
+                    <field name="NAME">0_userdata.0.wp.evcc.aktivierbar</field>
+                    <field name="TYPE">boolean</field>
+                    <field name="READABLE">TRUE</field>
+                    <field name="WRITEABLE">TRUE</field>
+                    <value name="VALUE">
+                      <block type="logic_boolean" id="]Rt`C%P!Bio=[uO7^ok_">
+                        <field name="BOOL">FALSE</field>
+                      </block>
+                    </value>
+                    <next>
+                      <block type="comment" id="rlzLVy2+Y!hCoxQ-{CFQ">
+                        <field name="COMMENT">Wird vom Steuerskript auf wahr gesetzt sobald&amp;#10;das Überladen angeschaltet wurde&amp;#10;Mapping auf mqtt Topic:&amp;#10;home/wp/evcc/aktiv</field>
+                        <next>
+                          <block type="create_ex" id="JP@0mbb|BR~uzZ5GIG@?">
+                            <field name="NAME">0_userdata.0.wp.evcc.aktiv</field>
+                            <field name="TYPE">boolean</field>
+                            <field name="READABLE">TRUE</field>
+                            <field name="WRITEABLE">TRUE</field>
+                            <value name="VALUE">
+                              <block type="logic_boolean" id="qv:{oEt98tHIs)nul~$g">
+                                <field name="BOOL">FALSE</field>
+                              </block>
+                            </value>
+                            <next>
+                              <block type="comment" id="DL+:{$YCC0Add#`VcN#;">
+                                <field name="COMMENT">Die maixmal erlaubte Leistung in Ampere&amp;#10;Der Wert wird von evcc gesetzt&amp;#10;Mapping auf mqtt Topic:&amp;#10;home/wp/evcc/maxStromstaerke</field>
+                                <next>
+                                  <block type="create_ex" id="3bT5k%VUYtz;nqkK5HOH">
+                                    <field name="NAME">0_userdata.0.wp.evcc.maxStromstaerke</field>
+                                    <field name="TYPE">number</field>
+                                    <field name="READABLE">TRUE</field>
+                                    <field name="WRITEABLE">TRUE</field>
+                                    <value name="VALUE">
+                                      <block type="math_number" id=",A2I18up#6V@lJ3PL:^Q">
+                                        <field name="NUM">0</field>
+                                      </block>
+                                    </value>
+                                    <next>
+                                      <block type="comment" id=",BwDG_J{wn1lTINn*^7E">
+                                        <field name="COMMENT">evcc übermittelt die gewünschte Temepratur des&amp;#10;Warmwasserspeichers über den Ladepunkt.&amp;#10;Die evcc Vorgabe wird in diesen Datenpunkt&amp;#10;übernommen&amp;#10;Wichtig: Bitte die Ladepunkt Nummer in Eurer Installation ermitteln (Ladepunkte von links nach rechts durchzählen)&amp;#10;Mapping auf mqtt Topic:&amp;#10;evcc/loadpoint/[LadepunktNrAusEvccInstallation]/&amp;#10;limitSoc&amp;#10;&amp;#10;Wert wird inital mit der maximal erlaubten Wasser-&amp;#10;temperatur angenommen.</field>
+                                        <next>
+                                          <block type="create_ex" id="#b_6;sXl#/.kPyY$jZ5|">
+                                            <field name="NAME">0_userdata.0.wp.evcc.pvZielTemp</field>
+                                            <field name="TYPE">number</field>
+                                            <field name="READABLE">TRUE</field>
+                                            <field name="WRITEABLE">TRUE</field>
+                                            <value name="VALUE">
+                                              <block type="variables_get" id="5Te%qKxhhGY)d~QXbyB4">
+                                                <field name="VAR" id="dH_WBDgeeJ)E9r_L6/By">maximaleWarmwasserTemperatur</field>
+                                              </block>
+                                            </value>
+                                            <next>
+                                              <block type="create_ex" id="h4Q0F=#s]UVXpIK*u%X6">
+                                                <field name="NAME">0_userdata.0.wp.evcc.mode</field>
+                                                <field name="TYPE">string</field>
+                                                <field name="READABLE">TRUE</field>
+                                                <field name="WRITEABLE">TRUE</field>
+                                                <value name="VALUE">
+                                                  <block type="text" id="(_v5u#||ykU*?uUu,.FB">
+                                                    <field name="TEXT">pv</field>
+                                                  </block>
+                                                </value>
+                                              </block>
+                                            </next>
+                                          </block>
+                                        </next>
+                                      </block>
+                                    </next>
+                                  </block>
+                                </next>
+                              </block>
+                            </next>
+                          </block>
+                        </next>
+                      </block>
+                    </next>
+                  </block>
+                </next>
+              </block>
+            </next>
+          </block>
+        </next>
+      </block>
+    </statement>
+  </block>
+  <block type="procedures_defnoreturn" id="1kBBRdHkMa2K!}F0lY;!" x="338" y="-1288">
+    <field name="NAME">datenpunkteStandartwerteSetzen</field>
+    <comment pinned="false" h="80" w="160">Describe this function...</comment>
+    <statement name="STACK">
+      <block type="comment" id="I34V.%wxh=QL~Y2P*J;v">
+        <field name="COMMENT">Standardwerte - werden durch einen Neustart&amp;#10;des Skripts gesetzt. &amp;#10;Nützlich während der Entwicklung um &amp;#10;definierte Werte zu erhalten &amp;#10;oder als "Reset" auf Standardwerte. </field>
+        <next>
+          <block type="update" id="!Q@5JU*oFAA3aoNB~~y^">
+            <mutation xmlns="http://www.w3.org/1999/xhtml" delay_input="false"></mutation>
+            <field name="OID">0_userdata.0.wp.evcc.aktivierbar</field>
+            <field name="WITH_DELAY">FALSE</field>
+            <value name="VALUE">
+              <block type="logic_boolean" id="%=]s3sX$*Ndzk33fSzag">
+                <field name="BOOL">FALSE</field>
+              </block>
+            </value>
+            <next>
+              <block type="update" id="OlabNul?{q,f8!D=/zPq">
+                <mutation xmlns="http://www.w3.org/1999/xhtml" delay_input="false"></mutation>
+                <field name="OID">0_userdata.0.wp.evcc.aktiv</field>
+                <field name="WITH_DELAY">FALSE</field>
+                <value name="VALUE">
+                  <block type="logic_boolean" id="ny%8_90=Iv8N`vo9_7dC">
+                    <field name="BOOL">FALSE</field>
+                  </block>
+                </value>
+                <next>
+                  <block type="update" id="C$TQRWyc~8+7+.$^aN|E">
+                    <mutation xmlns="http://www.w3.org/1999/xhtml" delay_input="false"></mutation>
+                    <field name="OID">0_userdata.0.wp.evcc.ladestatus</field>
+                    <field name="WITH_DELAY">FALSE</field>
+                    <value name="VALUE">
+                      <block type="text" id="$9w)3a`,j4B)4]TSzdeE">
+                        <field name="TEXT">B</field>
+                      </block>
+                    </value>
+                    <next>
+                      <block type="update" id="kJK=sYoPKf4LAIp`Ngck">
+                        <mutation xmlns="http://www.w3.org/1999/xhtml" delay_input="false"></mutation>
+                        <field name="OID">0_userdata.0.wp.evcc.maxStromstaerke</field>
+                        <field name="WITH_DELAY">FALSE</field>
+                        <value name="VALUE">
+                          <block type="math_number" id="XQ]0bloseW^1#JbNf?5V">
+                            <field name="NUM">0</field>
+                          </block>
+                        </value>
+                        <next>
+                          <block type="update" id="7Re7o819S4UC,!@_79YZ">
+                            <mutation xmlns="http://www.w3.org/1999/xhtml" delay_input="false"></mutation>
+                            <field name="OID">0_userdata.0.wp.steuerung.maxTemp</field>
+                            <field name="WITH_DELAY">FALSE</field>
+                            <value name="VALUE">
+                              <block type="variables_get" id="|}0OPeK.dQY6%8+.bLGX">
+                                <field name="VAR" id="dH_WBDgeeJ)E9r_L6/By">maximaleWarmwasserTemperatur</field>
+                              </block>
+                            </value>
+                            <next>
+                              <block type="update" id="2+6-7yy1MyBixuNbF486">
+                                <mutation xmlns="http://www.w3.org/1999/xhtml" delay_input="false"></mutation>
+                                <field name="OID">0_userdata.0.wp.evcc.pvZielTemp</field>
+                                <field name="WITH_DELAY">FALSE</field>
+                                <value name="VALUE">
+                                  <block type="variables_get" id="+ezZi7LMsCwwjGGfM8Ji">
+                                    <field name="VAR" id="dH_WBDgeeJ)E9r_L6/By">maximaleWarmwasserTemperatur</field>
+                                  </block>
+                                </value>
+                                <next>
+                                  <block type="update" id="g{a95}wTY+Po1+]gW%7*">
+                                    <mutation xmlns="http://www.w3.org/1999/xhtml" delay_input="false"></mutation>
+                                    <field name="OID">0_userdata.0.wp.evcc.pvZielTemp</field>
+                                    <field name="WITH_DELAY">FALSE</field>
+                                    <value name="VALUE">
+                                      <block type="variables_get" id="`WBXC{TCC!cgA)qFA-Z}">
+                                        <field name="VAR" id="dH_WBDgeeJ)E9r_L6/By">maximaleWarmwasserTemperatur</field>
+                                      </block>
+                                    </value>
+                                    <next>
+                                      <block type="update" id="UlKgNF9O!wfh$D%AI]gR">
+                                        <mutation xmlns="http://www.w3.org/1999/xhtml" delay_input="false"></mutation>
+                                        <field name="OID">0_userdata.0.wp.steuerung.stdTemp</field>
+                                        <field name="WITH_DELAY">FALSE</field>
+                                        <value name="VALUE">
+                                          <block type="variables_get" id="X{U6%YH/I[77lDn;pD:T">
+                                            <field name="VAR" id="qnYL}{~3]|a^bApl`Z$%">standardWarmwasserTemperatur</field>
+                                          </block>
+                                        </value>
+                                        <next>
+                                          <block type="update" id="mo31kl2$?yuAl:NIT{au">
+                                            <mutation xmlns="http://www.w3.org/1999/xhtml" delay_input="false"></mutation>
+                                            <field name="OID">0_userdata.0.wp.steuerung.sollTemp</field>
+                                            <field name="WITH_DELAY">FALSE</field>
+                                            <value name="VALUE">
+                                              <block type="variables_get" id="[MO}e-.kBk%)C=gXzQh)">
+                                                <field name="VAR" id="qnYL}{~3]|a^bApl`Z$%">standardWarmwasserTemperatur</field>
+                                              </block>
+                                            </value>
+                                          </block>
+                                        </next>
+                                      </block>
+                                    </next>
+                                  </block>
+                                </next>
+                              </block>
+                            </next>
+                          </block>
+                        </next>
+                      </block>
+                    </next>
+                  </block>
+                </next>
+              </block>
+            </next>
+          </block>
+        </next>
+      </block>
+    </statement>
+  </block>
+</xml>

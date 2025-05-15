@@ -1,0 +1,226 @@
+# Bitte achtet darauf, dass ihr die Installation von evcc über die Kommandozeile und 
+# nicht über das Webinterface durchgeführt habt. Das Webinterface erlaubt aktuell
+# keine „komplizierten“ / manuellen Gerätekonfigurationen.
+#
+# Achtet beim Einfügen der Daten auch darauf, dass ihr die Konfiguration aus der 
+# Installation nicht überschreibt.
+# Ebenso müssen die Einrückungen für das YAML Format korrekt sein.
+
+# Die evcc-Konfigurationsdatei startet mit diesen Daten - hier sind Beispieldaten
+# angegeben, die Details sehen anderes bei euch aus. Alle automatisch generierten
+# Zeilen habe ich zur Kennzeichnung auskommentiert.
+# Der erste Abschnitt, den ihr einfügt, ist der MQTT-Abschnitt.
+
+# network:
+#  schema: http
+#  host: evcc.local # .local suffix announces the hostname on MDNS
+#  port: 7070
+
+# log: debug
+# levels:
+#   cache: error
+#  unique installation id
+# plant: 
+
+# interval: 10s # control cycle interval
+
+# sponsortoken:
+
+# sponsors can set telemetry: true to enable anonymous data aggregation
+# see https://github.com/evcc-io/evcc/discussions/4554
+# telemetry:
+
+# Dieser Teil muss ergänzt werden – bitte IP-Adresse an eure Installation anpassen.
+# Die restlichen Daten müssen nicht angepasst werden.
+mqtt:
+  broker: [Eure IP-Adresse]:1883
+  topic: evcc
+  clientid: evccClient
+  user: mqtt
+  password: mqttmqtt
+
+# […]
+# Die automatische Konfiguration / die Daten eurer Solaranlage fehlen.
+# Ergänzt werden muss ein Zähler / Leistungsmesspunkt für die Wärmepumpe.
+# Die Daten werden über den bereits installierten MQTT-Broker ausgelesen und über die
+# (im Artikel beschriebene) ioBroker-Konfiguration bereitgestellt.
+# Als MQTT-Topics verwenden wir:
+# - home/wp/zaehler (für alle elektrischen Leistungsdaten)
+# - home/wp/evcc (für alle evcc relevanten Steuerdaten)
+# - home/wp/steuerung (für alle Steuerdaten der Wärmepumpe)
+#
+# Die Daten könnt ihr per Copy & Paste in den Abschnitt „meters“ übertragen.
+# Anpassungen sind nicht notwendig.
+meters:
+# […]
+# Beispiel für einen SMA-Energiemanager wie den Sunny Home Manager 2.
+# - type: template
+#   template: sma-home-manager
+#   usage: grid
+#   host: [IP Adresse Sunny Home Manager]
+#   name: EnergieZaehlerDerPVAnlage
+#
+# Beispieleinträge für SMA-Wechselrichter - auch diese sind im Sinne von evcc "Energiemesser".
+# - type: template
+#   template: sma-inverter
+#   usage: pv
+#   host: [Ip Adresse Wechselrichter]
+#   password: [...]
+#   name: pvWechselrichter1
+# - type: template
+#   template: sma-inverter
+#   usage: pv
+#   host: [Ip Adresse Wechselrichter]
+#   password: [...]
+#   name: pvWechselrichter2
+# - type: template
+#   template: sma-inverter
+#   usage: battery
+#   host: [Ip Adresse Wechselrichter]
+#   password: [...]
+#   name: batterieWechselrichter
+#
+# Ab hier Copy & Paste der Daten
+- type: custom
+  name: WPvirtuellerZaehler
+  power:
+    source: calc
+    mul:
+      - source: mqtt
+        topic: home/wp/zaehler/aktuelleLeistung
+      - source: const
+        value: 1000
+  currents: # Die aktuelle Stromstärke wird aus der elektrischen Leistung berechnet.
+      - source: mqtt
+        topic: home/wp/zaehler/aktuelleLeistung
+        scale: 4.34783 # Konvertierung von W in A (Leistung x 1/230 x 1000)
+      - source: const # Nur 1-phasiger Betrieb
+        value: 0
+      - source: const
+        value: 0
+# […]
+
+# Die Wärmepumpe wird in evcc als „Wallbox“ und als Auto (Vehicle)
+# dargestellt. evcc erwartet an dieser Stelle die Stati der Wallbox:
+# - aktivierbar: Der Ladepunkt hat ein E-Auto angeschlossen und ist bereit zum Laden.
+# - aktiv: Der Ladepunkt hat einen Verbraucher angeschlossen und lädt diesen.
+# - ladestatus: Der Ladestatus der Wallbox (ein Buchstabe, A, B oder C).
+# - maxStromstaerke: Die maximale Ladeleistung der Wallbox (z. B. 6 kw bei einer 
+#   Wärmepumpe mit 6 kw elektrischer Leistung
+# - maxTemp: Temperaturlimit, bis zu dem ein wirtschaftliches Überladen des
+#   Warmwasserspeichers möglich ist. Wert wird aus dem ioBroker Skript (per MQTT)
+#   übernommen und bei "chargers" und "vehicles" angegeben.
+#   
+#
+# Der Abschnitt kann ohne Änderung per Copy & Paste übernommen werden.
+chargers:
+# […]
+# - type: template
+#   template: easee
+#   user: [E-Mail Adresse]
+#   password: [...]
+#   charger: [Seriennummer Wallbox]
+#   name: easeeWallbox
+#   timeout: 20s # optional
+#
+# Falls in der Weboberfläche die Temperatur immer wieder auf 100 Grad Celsius "springt", kann / muss
+# die Standardtemperatur gesetzt werden. In der Betriebsart "Heizung" sind dazu die folgenden Schritte
+# notwendig:
+# - Unter "features" das Schlüsselwort "heating" auskommentieren und evcc neu starten.
+# - Beim Eintrag der Wärmepumpe gibt es einen neuen Menüpunkt "Plan" - diesen Anklicken.
+# - In das Menü "Ankunft" wechseln und den Standardwert für das Ladelimit auf die geünschte
+#   Temperatur setzten (z.B. 55 Grad Celsius).
+# - "heating" wieder aktivieren / Kommentar entfernen und evcc neu starten.
+- type: custom
+  name: WPvirtuelleWallbox 
+  icon: waterheater
+  features:
+    - integrateddevice
+    - heating
+  enable:
+    source: mqtt
+    topic: home/wp/evcc/aktivierbar
+  enabled:
+    source: mqtt
+    topic: home/wp/evcc/aktiv
+  status:
+    source: mqtt
+    topic: home/wp/evcc/ladestatus
+  maxcurrent:
+    source: mqtt
+    topic: home/wp/evcc/maxStromstaerke
+  limitsoc:
+    source: mqtt
+    topic: home/wp/steuerung/maxTemp
+    
+# […]
+# Die Wärmepumpe selbst ist aus Sicht von evcc ein Auto und wird unter „vehicles“
+# konfiguriert. Von einem Auto benötigt evcc „nur“ den aktuellen Batterieladestand.
+# Bei einer Wärmepumpe ist das die aktuelle Temperatur des Warmwasserspeichers.
+#
+# Die Werte aus diesem Abschnitt können auch per Copy & Paste ohne weitere Änderung übernommen werden.
+vehicles:
+# […]  
+- type: custom
+  name: WPvirtuellesAuto
+  title: Waterkotte WP
+  icon: waterheater
+  phases: 1
+  soc:
+    source: mqtt
+    topic: home/wp/zaehler/aktuelleTemp
+  limitsoc:
+    source: mqtt
+    topic: home/wp/steuerung/maxTemp
+# […]
+# Für evcc ist ein Ladepunkt eine Kombination aus Zähler, Wallbox und Auto.
+# In diesem Punkt wird auch das Steuerverhalten von evcc festgelegt. Mit 
+# "mode: pv" sorgt man dafür, dass die Wassertemperatur nur bei PV Überschuss erhöht wird.
+# Der "threshold: -3000" sorgt dafür, dass die Heizung nur bei einem PV-Überschuss von
+# mindestens 3000 Watt (Achtung, die Angabe erfolgt in Stromflussrichtung, also 
+# negativ!) eingeschaltet wird. Dieser Wert muss an die Leistung und
+# Steuermöglichkeit eurer Wärmepumpe angepasst werden. Im Idealfall kann der Punkt 
+# weggelassen oder auf 0 gesetzt werden.
+# Um ein Takten der Wärmepumpe zu vermeiden, muss der PV-Überschuss mindestens 5 Minuten
+# anliegen, und die Wärmepumpe läuft noch 20 Minten nach dem Ausschalten nach.
+# Das ist an wolkigen Tagen relevant und sorgt dafür, dass die Wärmepumpe
+# immer mindestens 20 Minuten läuft. Das Verhalten ist tolerabel, im Sommer kann
+# die Leistung in der Regel auch durch die Batterie bereitgestellt werden, die priorisiert
+# geladen wird.
+#
+# Weitere Änderungen müssen an dieser Stelle nicht vorgenommen werden.
+loadpoints:
+# […]
+#
+# Beispieleintrag für eine easee Wallbox
+# - title: Garage
+#   charger: easeeWallbox
+#   mode: pv # charge mode (off, now, minpv, pv)
+#   priority: 3
+- title: WP / Heizung
+  charger: WPvirtuelleWallbox
+  meter: WPvirtuellerZaehler
+  vehicle: WPvirtuellesAuto
+  mode: pv
+  phases: 1
+  priority: 5
+  enable:
+    threshold: -3000
+    delay: 5m
+  disable:
+    threshold: 0
+    delay: 20m
+
+# […]
+# Die Konfiguration "site" hängt von der von euch installierten Solaranlage ab. Die Einträge sind Beispielwerte
+# und dienen zur Orientierung.
+# site:
+#  title: make Ladepark
+#  residualPower: 100
+#  meters:
+#    grid: EnergieZaehlerDerPVAnlage
+#    pv:
+#    - pvWechselrichter1
+#    - pvWechselrichter2
+#    battery:
+#    - batterieWechselrichter
